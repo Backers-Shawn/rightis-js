@@ -1,0 +1,15 @@
+{
+  "name": "rightis-js",
+  "private": true,
+  "description": "JavaScript SDK and CLI for Rightis (rightis.org)",
+  "license": "MIT",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
+  }
+}
