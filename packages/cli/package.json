@@ -1,6 +1,6 @@
 {
   "name": "rightis",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Rightis CLI: log in, set up a sandbox key and run your first rights check",
   "license": "MIT",
   "type": "module",
