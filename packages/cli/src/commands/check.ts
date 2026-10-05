@@ -13,10 +13,12 @@ const ASSETS: readonly AssetType[] = ['face', 'voice', 'style', 'image'];
 const ALLOWED_NOT_FREE =
   'allowed is not free use: request the licence. It is approved without the holder reviewing it if the fee clears their floor.';
 
-export function printCheck(io: Io, r: RightsCheckResult, source: string): void {
+export function printCheck(io: Io, r: RightsCheckResult, source: string, askedId?: string): void {
+  // 키 있는 check 의 옛 서버는 맨 위 rights_id 를 싣지 않았다. 물은 값으로 채운다.
+  const rightsId = r.rights_id ?? r.matched_entity?.rights_id ?? askedId ?? '';
   // A server that has not adopted the Resolve contract on the keyed path yet.
   if (!r.next_action || !('decision' in r)) {
-    io.out(table([['rights id', r.rights_id ?? ''], ['rights status', String(r.rights_status ?? 'unknown')], ['source', source]]).join('\n'));
+    io.out(table([['rights id', rightsId], ['rights status', String(r.rights_status ?? 'unknown')], ['source', source]]).join('\n'));
     io.out('');
     io.out('This server returned the legacy check format without a decision. Use --public, or update the server.');
     return;
@@ -25,7 +27,7 @@ export function printCheck(io: Io, r: RightsCheckResult, source: string): void {
     ? `${r.identity.display_name}${r.identity.identity_verified ? ' (verified)' : ''}${r.identity.managed_by ? `, managed by ${r.identity.managed_by}` : ''}`
     : 'not registered';
   const rows: string[][] = [
-    ['rights id', r.rights_id],
+    ['rights id', rightsId],
     ['identity', who],
     ['decision', r.decision ?? 'none'],
     ['next action', r.next_action.url ? `${r.next_action.type}  ${r.next_action.url}` : r.next_action.type],
@@ -34,15 +36,15 @@ export function printCheck(io: Io, r: RightsCheckResult, source: string): void {
   if (r.registered) {
     rows.push(['training', `${r.training.decision} (do not train: ${r.training.do_not_train ? 'yes' : 'no'})`]);
   }
-  if (r.unmapped.length > 0) rows.push(['unmapped', r.unmapped.join(', ')]);
+  if ((r.unmapped ?? []).length > 0) rows.push(['unmapped', (r.unmapped ?? []).join(', ')]);
   rows.push(['source', source]);
   io.out(table(rows).join('\n'));
 
-  if (r.scopes.length > 0) {
+  if ((r.scopes ?? []).length > 0) {
     io.out('');
-    io.out(table([['SCOPE', 'STATE'], ...r.scopes.map((s) => [s.scope, s.state])]).join('\n'));
+    io.out(table([['SCOPE', 'STATE'], ...(r.scopes ?? []).map((s) => [String(s.scope), String(s.state)])]).join('\n'));
   }
-  const notes = [...r.notes];
+  const notes = [...(r.notes ?? [])];
   if (r.decision === 'allowed' && !notes.some((n) => /free use/i.test(n))) notes.push(ALLOWED_NOT_FREE);
   if (notes.length > 0) {
     io.out('');
@@ -103,7 +105,7 @@ Options:
     const source = found
       ? `keyed check (${rightis.environment ?? 'unknown'} key from ${found.source})`
       : 'public resolve (no API key)';
-    printCheck(io, result, source);
+    printCheck(io, result, source, rightsId);
     return 0;
   },
 };
