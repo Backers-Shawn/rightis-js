@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Backers-Shawn/rightis",
+  "title": "Rightis",
+  "description": "Identity-rights registry lookups before AI generation: is a face, voice or persona registered?",
+  "repository": {
+    "url": "https://github.com/Backers-Shawn/rightis-js",
+    "source": "github"
+  },
+  "websiteUrl": "https://rightis.org/en/developers",
+  "version": "1.0.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://rightis.org/api/public-mcp/mcp"
+    }
+  ]
+}
