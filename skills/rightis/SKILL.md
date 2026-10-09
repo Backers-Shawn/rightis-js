@@ -123,7 +123,7 @@ npx rightis login && npx rightis init   # sandbox key into .env.local (must be g
 npx rightis people                      # sandbox sample people, needs a brk_test_ key
 ```
 
-`check` options: `--use`, `--asset face|voice|style|image` (repeatable), `--training`,
+`check` options: `--use`, `--asset face|voice|style|image` (repeatable), `--method image_generation|video_generation|voice_synthesis` (repeatable, cli 0.1.3+), `--training`,
 `--json`, `--public` (ignore any key; a sandbox key only knows sandbox people).
 Exit code is 0 for every decision and non-zero only on errors.
 

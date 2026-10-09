@@ -19,6 +19,18 @@ const REGISTERED = {
 };
 
 describe('rightis check', () => {
+  it('sends --method as ai_methods, de-duplicated, and omits it when absent', async () => {
+    const { fetch, calls } = routedFetch({ 'POST /api/public/v1/rights/resolve': () => json(200, REGISTERED) });
+    const io = fakeIo({ cwd: await tempDir(), fetch });
+    expect(await main(['check', 'BR-AAAA-BBBB-CCCC', '--use', 'avatar generation', '--asset', 'image', '--method', 'image_generation', '--method', 'image_generation', '--method', 'video_generation'], io)).toBe(0);
+    expect(JSON.parse(calls[0]!.body!)).toEqual({
+      rights_id: 'BR-AAAA-BBBB-CCCC',
+      use_type: 'avatar generation',
+      asset_types: ['image'],
+      ai_methods: ['image_generation', 'video_generation'],
+    });
+  });
+
   it('uses the public resolve without a key and prints decision, next action and scopes', async () => {
     const { fetch, calls } = routedFetch({ 'POST /api/public/v1/rights/resolve': () => json(200, REGISTERED) });
     const io = fakeIo({ cwd: await tempDir(), fetch });

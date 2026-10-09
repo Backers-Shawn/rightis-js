@@ -49,7 +49,7 @@ node --env-file=.env.local rightis-example.mjs                          # 5. the
 | `rightis whoami` | Your organization, apps and keys (public key ids only). |
 | `rightis init` | Creates your organization if needed, issues a sandbox key, writes `RIGHTIS_SECRET_KEY` to `.env.local`, and writes an example. `--yes`, `--force`, `--framework next`, `--org-name`, `--use-case`, `--website`. |
 | `rightis people` | The sandbox sample people. Needs a `brk_test_` key in the environment or `.env.local`. |
-| `rightis check <rights_id>` | Decision, next action and scopes. `--use`, `--asset face\|voice\|style\|image` (repeatable), `--training`, `--json`, `--public`. |
+| `rightis check <rights_id>` | Decision, next action and scopes. `--use`, `--asset face\|voice\|style\|image` (repeatable), `--method image_generation\|video_generation\|voice_synthesis` (repeatable), `--training`, `--json`, `--public`. |
 
 Every command takes `--base-url <url>` (or `RIGHTIS_API_URL`) for a local server; http is accepted only for localhost.
 

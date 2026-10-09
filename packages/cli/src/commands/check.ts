@@ -56,7 +56,7 @@ export function printCheck(io: Io, r: RightsCheckResult, source: string, askedId
 export const checkCommand: Command = {
   name: 'check',
   summary: 'Ask whether a use of an identity is cleared',
-  help: `Usage: rightis check <rights_id> [--use <use_type>] [--asset face|voice|style|image ...] [--training] [--json] [--public]
+  help: `Usage: rightis check <rights_id> [--use <use_type>] [--asset face|voice|style|image ...] [--method <ai_method> ...] [--training] [--json] [--public]
 
 Asks Rightis for a decision and the next action. With a key in
 RIGHTIS_SECRET_KEY or .env.local this uses the keyed check; otherwise the
@@ -70,6 +70,9 @@ the licence.
 Options:
   --use <text>      What you intend to do, for example "instagram ad"
   --asset <type>    face, voice, style or image. Repeat for several
+  --method <name>   How it is generated, for example image_generation,
+                    video_generation or voice_synthesis. Repeat for several.
+                    Without it the answer covers only what --use implies
   --training        You intend to train on the identity
   --json            Print the raw JSON response
   --public          Ignore any API key and use the keyless public resolve
@@ -77,6 +80,7 @@ Options:
   options: {
     use: { type: 'string' },
     asset: { type: 'string', multiple: true },
+    method: { type: 'string', multiple: true },
     training: { type: 'boolean' },
     json: { type: 'boolean' },
     public: { type: 'boolean' },
@@ -89,6 +93,7 @@ Options:
     for (const a of assets) {
       if (!(ASSETS as readonly string[]).includes(a)) throw new UsageError(`--asset must be one of ${ASSETS.join(', ')} (got ${a})`);
     }
+    const methods = [...new Set(list(args.values.method).map((m) => m.trim()).filter(Boolean))];
     const baseUrl = resolveBaseUrl(str(args.values['base-url']), io.env);
     const found = args.values.public ? null : await loadSecretKey(io.cwd, io.env);
     const rightis = new Rightis({ apiKey: found?.key ?? null, baseUrl, fetch: io.fetch });
@@ -96,6 +101,7 @@ Options:
       rights_id: rightsId,
       ...(str(args.values.use) ? { use_type: str(args.values.use) } : {}),
       ...(assets.length > 0 ? { asset_types: [...new Set(assets)] as AssetType[] } : {}),
+      ...(methods.length > 0 ? { ai_methods: methods } : {}),
       ...(args.values.training ? { for_training: true } : {}),
     });
     if (args.values.json) {

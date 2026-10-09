@@ -51,7 +51,7 @@ const r = await rightis.rights.check({
 - Only a name: `rightis.rights.search(name, { limit: 5 })`. No match is not clearance.
 - No `isAllowed()` helper exists on purpose. Do not write one.
 - CLI: `npx rightis check BR-XXXX-XXXX-XXXX --use "instagram ad" --asset face --public`
-  (`--asset` repeatable, `--training`, `--json`). Exit 0 for every decision.
+  (`--asset` and `--method` repeatable, `--training`, `--json`). Exit 0 for every decision.
 - Keyless MCP: `https://rightis.org/api/public-mcp/mcp` (`rights_lookup`, `rights_search`, `registry_info`).
 
 Docs: https://rightis.org/en/developers and
