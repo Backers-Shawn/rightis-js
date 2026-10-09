@@ -1,0 +1,58 @@
+---
+description: Check a real person's identity rights with Rightis (rightis.org) before code generates or edits their face, voice or persona (image, video, audio, chat personas, face swap, voice clone, AI avatars, celebrity likeness, character IP). Covers @rightis/sdk, the rightis CLI, and how to read decision and next_action.
+globs:
+alwaysApply: false
+---
+
+# Rightis: check before generating a real person
+
+Rightis (https://rightis.org) is a public registry of identity rights. When code
+generates or edits the face, voice or persona of a real person or a registered
+character, add a Rightis check on the server, before the generation call, and act on
+`next_action`. The path to use always goes through a licence.
+
+Not permission:
+- `decision: "allowed"` is not free use. A licence request in those scopes is approved
+  without the holder reviewing it if the fee clears their floor. Still request it.
+- `decision: "unspecified"` means the holder said nothing. Not a yes.
+- `next_action.type: "not_registered"` means not in the registry. Not cleared.
+- A failed lookup (any `RightisError`: network, timeout, 5xx, 429, 402) is not
+  "not registered". Fail closed and do not generate.
+
+| decision | next_action.type | Code | Tell the user |
+|---|---|---|---|
+| `allowed` | `request_license` | Block until a licence is active | Pre-approved, licence still required |
+| `requires_approval` | `request_license` | Block until approved | The holder decides each request |
+| `unspecified` | `request_license` | Block, ask the holder | Holder has not said; not a yes |
+| `denied` | `stop` | Do not generate | The holder refuses this use |
+| `null` | `not_registered` | Do not generate | Not registered; not cleared |
+| `null` | `describe_use` | Re-ask with use fields | (internal) |
+
+Most restrictive wins: `denied > unspecified > requires_approval > allowed`. Also read
+`unmapped`, `training` (separate right; pass `for_training: true`) and `notes`.
+
+```ts
+import { Rightis, RightisError } from '@rightis/sdk'; // npm install @rightis/sdk
+
+const rightis = new Rightis(); // server only; reads RIGHTIS_SECRET_KEY, keyless resolve without it
+const r = await rightis.rights.check({
+  rights_id: 'BR-XXXX-XXXX-XXXX',
+  use_type: 'instagram ad',
+  ai_methods: ['image_generation'], // video_generation, voice_synthesis, style_transfer
+  asset_types: ['face'],            // face | voice | style | image
+  territory: ['US'],
+});
+// r.next_action.type: request_license | stop | not_registered | describe_use
+```
+
+- Go path: the app holds a licence code for this person and use,
+  `rightis.licenses.verify({ license_public_code })` returns `valid: true`, then
+  generate, then `rightis.usage.log([...])`.
+- Only a name: `rightis.rights.search(name, { limit: 5 })`. No match is not clearance.
+- No `isAllowed()` helper exists on purpose. Do not write one.
+- CLI: `npx rightis check BR-XXXX-XXXX-XXXX --use "instagram ad" --asset face --public`
+  (`--asset` repeatable, `--training`, `--json`). Exit 0 for every decision.
+- Keyless MCP: `https://rightis.org/api/public-mcp/mcp` (`rights_lookup`, `rights_search`, `registry_info`).
+
+Docs: https://rightis.org/en/developers and
+https://rightis.org/en/developers/guides/real-person-likeness

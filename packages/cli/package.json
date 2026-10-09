@@ -1,7 +1,7 @@
 {
   "name": "rightis",
-  "version": "0.1.1",
-  "description": "Rightis CLI: log in, set up a sandbox key and run your first rights check",
+  "version": "0.1.2",
+  "description": "Check identity rights (face, voice, persona) before your AI generates them — Rightis registry CLI",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -16,13 +16,25 @@
     "node": ">=20"
   },
   "keywords": [
-    "rightis",
-    "cli",
-    "rights",
+    "ai",
+    "generative-ai",
     "likeness",
-    "consent"
+    "right-of-publicity",
+    "deepfake",
+    "consent",
+    "face",
+    "voice",
+    "voice-clone",
+    "persona",
+    "avatar",
+    "image-generation",
+    "nofakes",
+    "identity-rights",
+    "rightis",
+    "mcp",
+    "cli"
   ],
-  "homepage": "https://rightis.org",
+  "homepage": "https://rightis.org/en/developers",
   "publishConfig": {
     "access": "public"
   },

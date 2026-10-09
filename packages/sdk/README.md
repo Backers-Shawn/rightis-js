@@ -1,36 +1,35 @@
 # @rightis/sdk
 
-Official JavaScript SDK for [Rightis](https://rightis.org), the identity-rights registry. Ask whether a use of a person's likeness is cleared, request licences, record usage, and verify webhooks.
+**Use this before your code generates a real person's face, voice or persona**: image, video and voice generation, face swap, voice cloning, AI avatars and chat personas of real people or registered characters. Call it on the server, before the generation call.
 
-> **Not on npm yet.** This package will be published as `@rightis/sdk@0.1.0`. The keyless calls (`rights.check` without a key, `rights.lookup`, `rights.search`) work against rightis.org today. The keyed `rights.check` returns the Resolve fields once the server release that adds them ships; `sandbox.people()` and `RightisConsole` need that release too.
+Official JavaScript SDK for [Rightis](https://rightis.org), the public registry of identity rights. Ask whether a use of a person's likeness is cleared, request licences, record usage, and verify webhooks.
 
-Node 20 or later, edge runtimes and browsers. No runtime dependencies. ESM and CommonJS.
+Node 20 or later, edge runtimes and browsers (keyless calls only in a browser: a secret key stays on the server). No runtime dependencies. ESM and CommonJS.
 
-## Quickstart
+## 30-second quickstart
 
-1. `npx rightis login` to sign in.
-2. `npx rightis init` to write a sandbox key (`RIGHTIS_SECRET_KEY`) to `.env.local`.
-3. `npx rightis people` to see the sandbox sample people.
-4. `npx rightis check BR-SANDBOX-... --use "social media ad" --asset face` for a first check in the terminal.
-5. Then in code:
+```bash
+npm install @rightis/sdk
+```
 
 ```ts
 import { Rightis } from '@rightis/sdk';
 
-const rightis = new Rightis(); // reads RIGHTIS_SECRET_KEY; server-side only
+const rightis = new Rightis(); // reads RIGHTIS_SECRET_KEY; keyless public resolve without it
 
 const result = await rightis.rights.check({
   rights_id: 'BR-XXXX-XXXX-XXXX',
-  use_type: 'social media ad',
+  use_type: 'instagram ad',
+  ai_methods: ['image_generation'],
   asset_types: ['face'],
   territory: ['US'],
 });
 
 switch (result.next_action.type) {
-  case 'request_license': // includes decision "allowed"
+  case 'request_license': // allowed, requires_approval, unspecified: a licence is required
     console.log('Request a licence at', result.next_action.url);
     break;
-  case 'stop':
+  case 'stop': // denied
     console.log('Refused:', result.next_action.reason);
     break;
   case 'not_registered': // not registered is not permission
@@ -39,6 +38,28 @@ switch (result.next_action.type) {
     break;
 }
 ```
+
+| `decision` | `next_action.type` | Meaning |
+|---|---|---|
+| `allowed` | `request_license` | Pre-approved scopes. **Not free use**: still request the licence. |
+| `requires_approval` | `request_license` | The holder decides each request. |
+| `unspecified` | `request_license` | The holder has said nothing. Not a yes. |
+| `denied` | `stop` | Refused. Do not generate. |
+| `null` | `not_registered` | Not in the registry. **Not cleared.** |
+| `null` | `describe_use` | No use described. Add `use_type`, `ai_methods`, `asset_types`. |
+
+A failed lookup is not "not registered": on any error, do not generate.
+
+Only have a name? `rightis.rights.search('name')` returns listed registrations with their Rights ID. No match is not clearance.
+
+For a sandbox key and sample people: `npx rightis login`, `npx rightis init`, `npx rightis people` (see the [`rightis` CLI](https://www.npmjs.com/package/rightis)).
+
+## Links
+
+- Developers: https://rightis.org/en/developers
+- Guide, generating real people: https://rightis.org/en/developers/guides/real-person-likeness
+- For AI coding assistants: [Claude Code skill](https://github.com/Backers-Shawn/rightis-js/blob/main/skills/rightis/SKILL.md), [Cursor rule](https://github.com/Backers-Shawn/rightis-js/blob/main/.cursor/rules/rightis.mdc), [AGENTS.md](https://github.com/Backers-Shawn/rightis-js/blob/main/AGENTS.md) (Codex and others, with a snippet for your own AGENTS.md or CLAUDE.md)
+- Source: https://github.com/Backers-Shawn/rightis-js
 
 ## "allowed" is not free use
 

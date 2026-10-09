@@ -1,12 +1,29 @@
 # rightis
 
-The Rightis CLI. Sign in, get a sandbox key, and run your first rights check in about five minutes.
-
-> **Not on npm yet.** This package will be published as `rightis@0.1.0`. `rightis check` works against rightis.org today. `login`, `init` and `whoami` need the Rightis server release that adds the console API (`/api/v1/console`) and the `console:manage` OAuth scope; `people` needs that release's sandbox sample people.
+**Use this before your code generates a real person's face, voice or persona.** The Rightis CLI checks the public registry of identity rights from your terminal, and sets up a sandbox key for the [`@rightis/sdk`](https://www.npmjs.com/package/@rightis/sdk).
 
 Node 20 or later.
 
-## Quickstart
+## 30-second quickstart
+
+```bash
+npx rightis check BR-XXXX-XXXX-XXXX --use "instagram ad" --asset face --public
+```
+
+`--public` asks the keyless resolve, so no account is needed. It prints the `decision`, the `next_action` and the per-scope states:
+
+| `decision` | `next_action.type` | Meaning |
+|---|---|---|
+| `allowed` | `request_license` | Pre-approved scopes. **Not free use**: still request the licence. |
+| `requires_approval` | `request_license` | The holder decides each request. |
+| `unspecified` | `request_license` | The holder has said nothing. Not a yes. |
+| `denied` | `stop` | Refused. Do not generate. |
+| `null` | `not_registered` | Not in the registry. **Not cleared.** |
+| `null` | `describe_use` | No use described. Add `use_type`, `ai_methods`, `asset_types`. |
+
+A failed lookup is not "not registered": on any error, do not generate.
+
+## Sandbox and keys
 
 ```bash
 npx rightis login                       # 1. sign in in your browser
@@ -15,6 +32,13 @@ npx rightis people                      # 3. list the sandbox sample people
 npx rightis check BR-SANDBOX-... --use "social media ad" --asset face   # 4. first check
 node --env-file=.env.local rightis-example.mjs                          # 5. the same check from code
 ```
+
+## Links
+
+- Developers: https://rightis.org/en/developers
+- Guide, generating real people: https://rightis.org/en/developers/guides/real-person-likeness
+- For AI coding assistants: [Claude Code skill](https://github.com/Backers-Shawn/rightis-js/blob/main/skills/rightis/SKILL.md), [Cursor rule](https://github.com/Backers-Shawn/rightis-js/blob/main/.cursor/rules/rightis.mdc), [AGENTS.md](https://github.com/Backers-Shawn/rightis-js/blob/main/AGENTS.md) (Codex and others, with a snippet for your own AGENTS.md or CLAUDE.md)
+- Source: https://github.com/Backers-Shawn/rightis-js
 
 ## Commands
 

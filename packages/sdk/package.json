@@ -1,7 +1,7 @@
 {
   "name": "@rightis/sdk",
-  "version": "0.1.0",
-  "description": "Official JavaScript SDK for Rightis, the identity-rights registry (rightis.org)",
+  "version": "0.1.1",
+  "description": "Check identity rights (face, voice, persona) before your AI generates them — Rightis registry SDK",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -30,14 +30,24 @@
     "node": ">=20"
   },
   "keywords": [
-    "rightis",
-    "rights",
-    "likeness",
-    "consent",
     "ai",
-    "license"
+    "generative-ai",
+    "likeness",
+    "right-of-publicity",
+    "deepfake",
+    "consent",
+    "face",
+    "voice",
+    "voice-clone",
+    "persona",
+    "avatar",
+    "image-generation",
+    "nofakes",
+    "identity-rights",
+    "rightis",
+    "mcp"
   ],
-  "homepage": "https://rightis.org",
+  "homepage": "https://rightis.org/en/developers",
   "publishConfig": {
     "access": "public"
   },
